@@ -5,7 +5,7 @@ set of practical labs for kubernetes i wish useful for u  ♡
 
 *  [Create Pods]()
 *  [ReplicaSets]()
-*  Deployments
+*  [Deployments]()
 
 ## Create Pods
 * Create a pod with the name redis and with the image redis.
@@ -113,5 +113,68 @@ create a ReplicaSet with
 name= replica-set-1
 image= busybox
 replicas= 3
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-replica
+  labels:
+    app: busyboxiti
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: backend
+  template:
+    metadata:
+      labels:
+        tier: backend
+    spec:
+      containers:
+      - name: busyboxiti
+        image: busybox
+        command:
+          - sleep
+          - "3600"
+```
+output
+```
+$ kubectl apply -f replicaset-busybox.yaml 
+replicaset.apps/busyboxiti-replica created
+$ kubectl get all
+NAME                           READY   STATUS    RESTARTS   AGE
+pod/busyboxiti-replica-98785   1/1     Running   0          13s
+pod/busyboxiti-replica-cffbj   1/1     Running   0          13s
+pod/busyboxiti-replica-llqmt   1/1     Running   0          13s
 
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   3d5h
 
+NAME                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/busyboxiti-replica   3         3         3       13s
+```
+scale pods to 7 pods
+```
+$ kubectl scale replicaset.apps/busyboxiti-replica --replicas=7
+replicaset.apps/busyboxiti-replica scaled
+$ kubectl get all
+NAME                           READY   STATUS    RESTARTS   AGE
+pod/busyboxiti-replica-98785   1/1     Running   0          83s
+pod/busyboxiti-replica-cffbj   1/1     Running   0          83s
+pod/busyboxiti-replica-llqmt   1/1     Running   0          83s
+pod/busyboxiti-replica-nd49x   1/1     Running   0          8s
+pod/busyboxiti-replica-ngxds   1/1     Running   0          8s
+pod/busyboxiti-replica-r6dz7   1/1     Running   0          8s
+pod/busyboxiti-replica-rqxmk   1/1     Running   0          8s
+
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   3d5h
+
+NAME                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/busyboxiti-replica   7         7         7       83s
+```
+* impotant not if u delete one of replicas pods it will running agin automatically
+<div align="right">
+    <b><a href="#">↥ back to top</a></b>
+</div>
