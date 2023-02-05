@@ -6,6 +6,8 @@ set of practical labs for kubernetes i wish useful for u  ♡
 *  [Create Pods]()
 *  [ReplicaSets]()
 *  [Deployments]()
+*  [Resources Limits]()
+*  [NameSpaces]()
 
 ## Create Pods
 * Create a pod with the name redis and with the image redis.
@@ -247,6 +249,230 @@ deployment "nginx-deployment-iti" successfully rolled out
 
 ```
 * important not if u not write version of image it takes tha latest automatically 
+
+<div align="right">
+    <b><a href="#">↥ back to top</a></b>
+</div>
+
+## Resources Limits
+
+* important note if tha application need of cpu exceed limits pod of cpu it will be throttle
+* if tha application need of memory exceed limits pod of memory it will be terminate
+in case cpu
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cpu-demo
+spec:
+  containers:
+    - name: cpu-demo-ctr
+      image: vish/stress
+      resources:
+        limits:
+          cpu: "1"
+        requests:
+          cpu: "0.5"
+      args:
+      - -cpus
+      - "2"
+```
+output
+```
+$ kubectl apply -f cpu-limit.yaml 
+pod/cpu-demo created
+$ kubectl get pod
+NAME       READY   STATUS    RESTARTS   AGE
+cpu-demo   1/1     Running   0          21s
+```
+in case memory
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mem-demo
+spec:
+  containers:
+    - name: mem-demo-ctr
+      image: polinux/stress 
+      resources:
+        limits:
+          memory: "100"
+        requests:
+          memory: "50"
+      command: ["stress"]
+      args: ["--vm", "1", "--vm-bytes", "250M", "--vm-hang", "1"]
+```
+output
+```
+$ kubectl apply -f mem-limit.yaml 
+pod/mem-demo created
+$ kubectl get pod
+NAME       READY   STATUS              RESTARTS   AGE
+mem-demo   0/1     ContainerCreating   0          5m49s
+
+```
+* limit range:Provides constraints to limit resource consumption per Containers or Pods in a namespace.
+in case cpu
+```yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-resource-constraint
+spec:
+  limits:
+  - default: # this section defines default limits
+      cpu: 500m
+    defaultRequest: # this section defines default requests
+      cpu: 500m
+    max: # max and min define the limit range
+      cpu: "1"
+    min:
+      cpu: 100m
+    type: Container
+```
+```
+$kubectl create namespace default-mem-example
+$kubectl apply -f memory-defaults.yaml --namespace=default-mem-example
+```
+in case memory
+```yaml
+apiVersion: v1
+
+kind: LimitRange
+metadata:
+  name: mem-limit-range
+spec:
+  limits:
+  - default:
+      memory: 512Mi
+    defaultRequest:
+      memory: 256Mi
+    type: Container
+
+```
+```
+$kubectl create namespace default-cpu-example
+$kubectl apply -f cpu-defaults.yaml --namespace=default-cpu-example
+```
+* ResourceQuota:you might decide to limit how many Deployments that can live in a single namespace.
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+    name: pods-high
+spec:
+    hard:
+      requests.cpu: "5"
+      requests.memory: 5Gi
+      limits.cpu: "10"
+      limits.memory: 10Gi
+      pods: "5"
+
+```
+we deploy pods with replica 7 but 5 only will deploy
+```
+$ kubectl apply -f qouta-resource.yaml 
+resourcequota/pods-high created
+$ kubectl describe quota
+Name:            pods-high
+Namespace:       default
+Resource         Used   Hard
+--------         ----   ----
+limits.cpu       2500m  10
+limits.memory    640Mi  10Gi
+pods             5      5
+requests.cpu     2500m  5
+requests.memory  640Mi  5Gi
+
+```
+<div align="right">
+    <b><a href="#">↥ back to top</a></b>
+</div>
+
+## NameSpaces
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: iti
+  labels:
+    name: iti
+```
+```
+$ kubectl apply -f namespace.yaml 
+namespace/iti created
+$ kubectl create namespace pro
+namespace/pro created
+$ kubectl get namespace
+NAME                        STATUS   AGE
+default                     Active   36d
+haproxy-controller-devops   Active   19d
+iti                         Active   2m12s
+kube-node-lease             Active   36d
+kube-public                 Active   36d
+kube-system                 Active   36d
+kubernetes-dashboard        Active   3d12h
+pro                         Active   15s
+
+```
+Create a deployment with
+Name: beta
+Image: redis
+Replicas: 2
+Namespace: finance
+Resources Requests:
+CPU: .5 vcpu
+Mem: 1G
+Resources Limits:
+CPU: 1 vcpu
+Mem: 2G
+
+create finance namespace
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: finance
+  labels:
+    name: finance
+
+```
+create beta deploy
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beta-deploy
+  Namespace: finance
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis-iti
+        image: redis
+        resources:
+          requests:
+            memory: "0.5"
+            cpu: 1Gi
+          limits:
+            memory: 2Gi
+            cpu: "1"
+            
+```
+```
+$ kubectl apply -f finance-namespace.yaml 
+namespace/finance configured
+$ kubectl apply -f beta-deploy.yaml 
+deployment.apps/beta-deploy created
+```
 
 <div align="right">
     <b><a href="#">↥ back to top</a></b>
