@@ -178,3 +178,76 @@ replicaset.apps/busyboxiti-replica   7         7         7       83s
 <div align="right">
     <b><a href="#">↥ back to top</a></b>
 </div>
+
+## Deployments
+create a Deployment with
+name= deployment-iti
+image= nginx
+replicas= 3
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment-iti
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx-iti
+        image: nginx
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+```
+output
+
+```
+$ kubectl apply -f deployment-nginx.yaml 
+deployment.apps/nginx-deployment-iti created
+$ kubectl get all
+NAME                                        READY   STATUS    RESTARTS   AGE
+pod/nginx-deployment-iti-5db7769d55-5w9tq   1/1     Running   0          11s
+pod/nginx-deployment-iti-5db7769d55-n95m9   1/1     Running   0          11s
+pod/nginx-deployment-iti-5db7769d55-vmd6s   1/1     Running   0          11s
+
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   3d5h
+
+NAME                                   READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/nginx-deployment-iti   3/3     3            3           11s
+
+NAME                                              DESIRED   CURRENT   READY   AGE
+replicaset.apps/nginx-deployment-iti-5db7769d55   3         3         3       11s
+
+
+```
+* uopdate of deployment 
+```
+$ kubectl set image deployment.apps/nginx-deployment-iti nginx-iti=nginx:1.2.14
+deployment.apps/nginx-deployment-iti image updated
+$ kubectl rollout status deployment.apps/nginx-deployment-iti
+Waiting for deployment "nginx-deployment-iti" rollout to finish: 1 out of 3 new replicas have been updated...
+```
+* rollout of deployment
+```
+$ kubectl rollout undo deployment.apps/nginx-deployment-iti
+deployment.apps/nginx-deployment-iti rolled back
+$ kubectl rollout status deployment.apps/nginx-deployment-iti
+deployment "nginx-deployment-iti" successfully rolled out
+
+```
+* important not if u not write version of image it takes tha latest automatically 
+
+<div align="right">
+    <b><a href="#">↥ back to top</a></b>
+</div>
