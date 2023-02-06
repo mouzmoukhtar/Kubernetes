@@ -82,7 +82,7 @@ Events:
   Normal  Started    3m47s  kubelet            Started container redis
 
 ```
-* Create a pod with the name nginx and with the image “nginx-iti”
+* Create a pod with the name nginx-iti and with the image “nginx”
 ```yaml
 apiVersion: v1
 kind: Pod
