@@ -484,3 +484,111 @@ deployment.apps/beta-deploy created
 <div align="right">
     <b><a href="#">↥ back to top</a></b>
 </div>
+
+
+## 5. Services
+* Deploy a pod named nginx-pod using the nginx:alpine image with
+the labels set to tier=backend.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: nginx
+        tier: backend
+    spec:
+      containers:
+      - name: nginx-backend
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+
+
+```
+```
+$ kubectl apply -f deploy-nginx-backend.yaml 
+deployment.apps/nginx-backend created
+```
+Deploy a test pod using the nginx:alpine image
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: nginx
+        tier: backend
+    spec:
+      containers:
+      - name: nginx-test
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+
+```
+```
+$ kubectl apply -f deploy-test-pod.yaml 
+deployment.apps/nginx-test created
+
+```
+Create a service backend-service to expose the backend
+application within the cluster on port 80.
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service-np
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+  selector:
+      app: nginx
+      tier: backend
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service-ip
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx
+    tier: backend
+    
+```
+```
+$ kubectl apply -f backend-service.yaml 
+service/backend-service-np created
+service/backend-service-ip created
+```
+
+
+
+
+
