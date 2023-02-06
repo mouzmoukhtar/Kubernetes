@@ -6,8 +6,8 @@ set of practical labs for kubernetes i wish useful for u  ♡
 1.  [Create Pods](#1-Create-Pods)
 1.  [ReplicaSets](#2-ReplicaSets)
 1.  [Deployments](#3-Deployments)
-1.  [Resources Limits](#-Resources-Limits)
-1.  [NameSpaces](#-NameSpaces)
+1.  [Resources Limits](#4-Resources-Limits)
+1.  [NameSpaces](#5-NameSpaces)
 
 ## 1. Create Pods
 * Create a pod with the name redis and with the image redis.
