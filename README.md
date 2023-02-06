@@ -811,4 +811,50 @@ fluentd-elasticsearch   1         1         1       1            1           <no
     <b><a href="#">↥ back to top</a></b>
 </div>
 
+## 10. Init containers
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: myapp-container
+    image: busybox:1.28
+    command: ['sh', '-c', 'echo The app is running! && sleep 3600']
+  initContainers:
+  - name: init-myservice
+    image: busybox:1.28
+    command: ['sh', '-c', "echo waiting for myservice; sleep 2;"]
+  - name: init-mydb
+    image: busybox:1.28
+    command: ['sh', '-c', "echo waiting for mydb; sleep 2;"]
+
+```
+```
+$ kubectl apply -f init-container.yaml 
+pod/myapp-pod created
+```
+<div align="right">
+    <b><a href="#">↥ back to top</a></b>
+</div>
+
+## 11. Multi containers
+
+
+*   Sidecar containers
+*   Ambassador containers
+*   Adapter containers
+
+[useful link about this tobic](https://kubernetes.io/blog/2015/06/the-distributed-system-toolkit-patterns/)
+
+
+<div align="right">
+    <b><a href="#">↥ back to top</a></b>
+</div>
+
+
 
