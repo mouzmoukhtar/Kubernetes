@@ -748,7 +748,7 @@ Events:
 </div>
 
 ## 8. Static pods
-/etc/kubernetes/manifests this location can u create static pod when scheduler not working
+[/etc/kubernetes/manifests] this location can u create static pod when scheduler not working
 can u get from this cmd
 ```
 $ kubectl get pods -n kube-system
