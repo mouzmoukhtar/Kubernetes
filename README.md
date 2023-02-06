@@ -588,6 +588,104 @@ service/backend-service-np created
 service/backend-service-ip created
 ```
 
+try to curl the backend-service from the test pod. What is the response?
+```
+$ kubectl get po -o wide
+NAME                             READY   STATUS    RESTARTS      AGE    IP            NODE       NOMINATED NODE   READINESS GATES
+nginx-backend-64d54d7f54-btswf   1/1     Running   1 (39m ago)   117m   172.17.0.14   minikube   <none>           <none>
+nginx-test-9f8f95f8b-bc2zk       1/1     Running   1 (39m ago)   131m   172.17.0.15   minikube   <none>           <non
+$ kubectl exec -it nginx-test-9f8f95f8b-bc2zk -- /bin/sh
+/ # curl 172.17.0.14 
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+```
+Create a deployment named web-app using the image nginx with 2 replicas
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-web-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx-web-app
+        image: nginx
+        ports:
+        - containerPort: 80
+        
+```
+
+```
+$ kubectl expose deployment nginx-web-app --name=web-app-svc --type=NodePort --port=80 --target-port=80
+service/web-app-svc exposed
+$ kubectl get svc
+NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+kubernetes    ClusterIP   10.96.0.1        <none>        443/TCP        4m18s
+web-app-svc   NodePort    10.108.129.154   <none>        80:32355/TCP   12s
+ minikube service web-app-svc
+|-----------|-------------|-------------|---------------------------|
+| NAMESPACE |    NAME     | TARGET PORT |            URL            |
+|-----------|-------------|-------------|---------------------------|
+| default   | web-app-svc |          80 | http://192.168.58.2:32355 |
+|-----------|-------------|-------------|---------------------------|
+🎉  Opening service default/web-app-svc in default browser...
+$ kubectl port-forward service/web-app-svc 9090:80
+Forwarding from 127.0.0.1:9090 -> 80
+Forwarding from [::1]:9090 -> 80
+Handling connection for 9090
+Handling connection for 9090
+
+
+```
+Expose the web-app as service web-app-service application on
+port 80 and nodeport 30082 on the nodes on the cluster
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-service-np
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30082
+  selector:
+      app: nginx
+    
+```
+```
+$ kubectl apply -f web-app-service.yaml 
+service/web-app-service-np created
+$ kubectl get svc
+NAME                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+kubernetes           ClusterIP   10.96.0.1       <none>        443/TCP        20m
+web-app-service-np   NodePort    10.104.158.92   <none>        80:30082/TCP   62s
+$ minikube service web-app-service-np
+|-----------|--------------------|-------------|---------------------------|
+| NAMESPACE |        NAME        | TARGET PORT |            URL            |
+|-----------|--------------------|-------------|---------------------------|
+| default   | web-app-service-np |          80 | http://192.168.58.2:30082 |
+|-----------|--------------------|-------------|---------------------------|
+🎉  Opening service default/web-app-service-np in default browser...
+```
+
+<div align="right">
+    <b><a href="#">↥ back to top</a></b>
+</div>
+
+
 
 
 
