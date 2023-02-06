@@ -3,13 +3,13 @@ set of practical labs for kubernetes i wish useful for u  ♡
 
 ## agenda 
 
-*  [Create Pods](Create-Pods)
-*  [ReplicaSets]()
+1.  [Create Pods](#1-Create-Pods)
+1.  [ReplicaSets](#2-ReplicaSets)
 *  [Deployments]()
 *  [Resources Limits]()
 *  [NameSpaces]()
 
-## Create Pods
+## 1. Create Pods
 * Create a pod with the name redis and with the image redis.
 ```yaml
 apiVersion: v1
@@ -110,7 +110,7 @@ kubectl describe pod nginx-pod
     <b><a href="#">↥ back to top</a></b>
 </div>
 
-## ReplicaSets
+## 2. ReplicaSets
 create a ReplicaSet with 
 name= replica-set-1
 image= busybox
