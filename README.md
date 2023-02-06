@@ -3,7 +3,7 @@ set of practical labs for kubernetes i wish useful for u  ♡
 
 ## agenda 
 
-*  [Create Pods]()
+*  [Create Pods](Create-Pods)
 *  [ReplicaSets]()
 *  [Deployments]()
 *  [Resources Limits]()
