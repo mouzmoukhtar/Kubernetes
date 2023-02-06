@@ -486,7 +486,7 @@ deployment.apps/beta-deploy created
 </div>
 
 
-## 5. Services
+## 6. Services
 * Deploy a pod named nginx-pod using the nginx:alpine image with
 the labels set to tier=backend.
 
