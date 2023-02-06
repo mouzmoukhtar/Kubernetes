@@ -397,7 +397,7 @@ requests.memory  640Mi  5Gi
     <b><a href="#">↥ back to top</a></b>
 </div>
 
-## 5. NameSpaces
+## 5. Services
 ```yaml
 apiVersion: v1
 kind: Namespace
