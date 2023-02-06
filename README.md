@@ -181,7 +181,7 @@ replicaset.apps/busyboxiti-replica   7         7         7       83s
     <b><a href="#">↥ back to top</a></b>
 </div>
 
-## Deployments
+## 3. Deployments
 create a Deployment with
 name= deployment-iti
 image= nginx
@@ -254,7 +254,7 @@ deployment "nginx-deployment-iti" successfully rolled out
     <b><a href="#">↥ back to top</a></b>
 </div>
 
-## Resources Limits
+## 4. Resources Limits
 
 * important note if tha application need of cpu exceed limits pod of cpu it will be throttle
 * if tha application need of memory exceed limits pod of memory it will be terminate
@@ -390,7 +390,7 @@ requests.memory  640Mi  5Gi
     <b><a href="#">↥ back to top</a></b>
 </div>
 
-## NameSpaces
+## 5. NameSpaces
 ```yaml
 apiVersion: v1
 kind: Namespace
