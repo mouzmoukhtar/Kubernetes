@@ -686,7 +686,84 @@ $ minikube service web-app-service-np
 </div>
 
 
+## 7. StartUp & Readiness &Liveness
 
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-exec
+spec:
+  containers:
+  - name: liveness
+    image: registry.k8s.io/busybox
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
 
+```
 
+```
+$ kubectl apply -f pods/probe/exec-liveness.yaml 
+pod/liveness-exec created
+$ kubectl describe pod liveness-exec
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  40s   default-scheduler  Successfully assigned default/liveness-exec to minikube
+  Normal  Pulling    40s   kubelet            Pulling image "registry.k8s.io/busybox"
+  Normal  Pulled     31s   kubelet            Successfully pulled image "registry.k8s.io/busybox" in 8.315409155s
+  Normal  Created    31s   kubelet            Created container liveness
+  Normal  Started    31s   kubelet            Started container liveness
+$ kubectl describe pod liveness-exec
+Events:
+  Type     Reason     Age                   From               Message
+  ----     ------     ----                  ----               -------
+  Normal   Scheduled  4m32s                 default-scheduler  Successfully assigned default/liveness-exec to minikube
+  Normal   Pulled     4m23s                 kubelet            Successfully pulled image "registry.k8s.io/busybox" in 8.315409155s
+  Normal   Pulled     3m10s                 kubelet            Successfully pulled image "registry.k8s.io/busybox" in 1.544904093s
+  Normal   Created    112s (x3 over 4m23s)  kubelet            Created container liveness
+  Normal   Started    112s (x3 over 4m23s)  kubelet            Started container liveness
+  Normal   Pulled     112s                  kubelet            Successfully pulled image "registry.k8s.io/busybox" in 5.194440263s
+  Warning  Unhealthy  67s (x9 over 3m52s)   kubelet            Liveness probe failed: cat: can't open '/tmp/healthy': No such file or directory
+  Normal   Killing    67s (x3 over 3m42s)   kubelet            Container liveness failed liveness probe, will be restarted
+  Normal   Pulling    37s (x4 over 4m32s)   kubelet            Pulling image "registry.k8s.io/busybox"
+
+```
+
+[The rest of the examples](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
+
+<div align="right">
+    <b><a href="#">↥ back to top</a></b>
+</div>
+
+## 8. Static pods
+/etc/kubernetes/manifests this location can u create static pod when scheduler not working
+can u get from this cmd
+```
+$ kubectl get pods -n kube-system
+NAME                               READY   STATUS    RESTARTS        AGE
+coredns-565d847f94-d7jkk           1/1     Running   22 (158m ago)   37d
+etcd-minikube                      1/1     Running   22 (158m ago)   37d
+fluentd-elasticsearch-6sqvc        1/1     Running   17 (158m ago)   27d
+kube-apiserver-minikube            1/1     Running   22 (158m ago)   37d
+kube-controller-manager-minikube   1/1     Running   22 (158m ago)   37d
+kube-proxy-zcd6x                   1/1     Running   22 (158m ago)   37d
+kube-scheduler-minikube            1/1     Running   22 (158m ago)   37d
+storage-provisioner                1/1     Running   41 (157m ago)   37d
+
+```
+<div align="right">
+    <b><a href="#">↥ back to top</a></b>
+</div>
 
