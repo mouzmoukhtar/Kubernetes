@@ -767,6 +767,8 @@ storage-provisioner                1/1     Running   41 (157m ago)   37d
     <b><a href="#">↥ back to top</a></b>
 </div>
 
+## 9. Static pods
+
 ```yaml
 apiVersion: apps/v1
 kind: DaemonSet
