@@ -767,3 +767,46 @@ storage-provisioner                1/1     Running   41 (157m ago)   37d
     <b><a href="#">↥ back to top</a></b>
 </div>
 
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd-elasticsearch
+  labels:
+    k8s-app: fluentd-logging
+spec:
+  selector:
+    matchLabels:
+      name: fluentd-elasticsearch
+  template:
+    metadata:
+      labels:
+        name: fluentd-elasticsearch
+    spec:
+      tolerations:
+      # these tolerations are to have the daemonset runnable on control plane nodes
+      # remove them if your control plane nodes should not run pods
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: fluentd-elasticsearch
+        image: quay.io/fluentd_elasticsearch/fluentd:v2.5.2
+```
+```
+$ kubectl apply -f daemonset.yaml 
+daemonset.apps/fluentd-elasticsearch created
+$ kubectl get daemonsets 
+NAME                    DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+fluentd-elasticsearch   1         1         1       1            1           <none>  
+
+```
+
+<div align="right">
+    <b><a href="#">↥ back to top</a></b>
+</div>
+
+
